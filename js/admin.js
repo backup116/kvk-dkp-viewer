@@ -43,6 +43,9 @@ function setupAdminNavigation() {
                 loadUploadStatus();
             } else if (targetView === 'rankings') {
                 loadRankings();
+            } else if (targetView === 'players') {
+                // Redirect to main site with players tab
+                window.open('index.html#players', '_blank');
             } else if (targetView === 'analytics') {
                 loadAnalytics();
             }
@@ -433,6 +436,7 @@ function getCampIcon(camp) {
     };
     return icons[camp] || '';
 }
+
 
 // Load analytics
 async function loadAnalytics() {
@@ -925,8 +929,12 @@ async function resetDatabase() {
             window.dataRetriever.clearCache();
         }
         
-        // Clear local storage
+        // Clear local storage but preserve admin authentication
+        const adminAuth = localStorage.getItem('admin_auth');
         localStorage.clear();
+        if (adminAuth) {
+            localStorage.setItem('admin_auth', adminAuth);
+        }
         
         console.log(`Database reset complete! Deleted ${deleteCount} records.`);
         alert(`Database reset complete!\nDeleted ${deleteCount} records.\n\nThe page will now reload.`);

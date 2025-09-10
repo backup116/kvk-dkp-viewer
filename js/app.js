@@ -9,6 +9,18 @@ function initializeApp() {
     loadCampStatistics();
     setupFilters();
     setupEventListeners();
+    handleUrlHash();
+}
+
+// Handle URL hash navigation
+function handleUrlHash() {
+    const hash = window.location.hash.substring(1);
+    if (hash) {
+        const navBtn = document.querySelector(`[data-view="${hash}"]`);
+        if (navBtn) {
+            navBtn.click();
+        }
+    }
 }
 
 // Navigation between views
@@ -298,21 +310,26 @@ async function loadPlayerStats(eventFilter = 'cumulative', kdFilter = '', campFi
             players = Array.from(playerMap.values());
         } else {
             // Get players for specific event
-            // Query events collection first, then get players for that event
-            const eventsSnapshot = await db.collection('events')
-                .where('eventName', '==', eventFilter)
+            // Data structure: events/[eventName]/kingdoms/[kdNumber]/players/[playerId]
+            players = [];
+            
+            // Get all kingdoms for this event
+            const kingdomsSnapshot = await db.collection('events')
+                .doc(eventFilter)
+                .collection('kingdoms')
                 .get();
             
-            players = [];
-            for (const eventDoc of eventsSnapshot.docs) {
+            // Get players from each kingdom
+            for (const kingdomDoc of kingdomsSnapshot.docs) {
                 const playersSnapshot = await db.collection('events')
-                    .doc(eventDoc.id)
+                    .doc(eventFilter)
+                    .collection('kingdoms')
+                    .doc(kingdomDoc.id)
                     .collection('players')
                     .get();
                 
                 playersSnapshot.forEach(playerDoc => {
                     const playerData = playerDoc.data();
-                    playerData.eventName = eventFilter;
                     players.push(playerData);
                 });
             }
