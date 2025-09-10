@@ -576,25 +576,18 @@ body {
     transform: translate(-50%, -50%);
     white-space: nowrap;
     
-    /* Glassmorphism effect */
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    /* Simple, clean styling */
+    background: #ffffff;
+    border: 2px solid #000000;
     border-radius: 20px;
+    color: #000000;
     
     /* Subtle shadow for depth */
     box-shadow: 
         0 4px 6px rgba(0, 0, 0, 0.1),
-        0 1px 3px rgba(0, 0, 0, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        0 1px 3px rgba(0, 0, 0, 0.08);
     
-    /* Text styling */
-    color: #fff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    letter-spacing: 0.5px;
-    
-    /* Add subtle animation */
+    /* Add entrance animation */
     animation: fadeIn 0.6s ease-out;
 }
 
@@ -608,6 +601,7 @@ body {
         transform: translate(-50%, -50%) scale(1);
     }
 }
+
 
 @keyframes float {
     0%, 100% {
@@ -649,15 +643,14 @@ body {
     transform: translate(-50%, -50%) scale(1.15) translateY(-2px);
     box-shadow: 
         0 8px 16px rgba(0, 0, 0, 0.2),
-        0 3px 6px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        0 3px 6px rgba(0, 0, 0, 0.15);
     z-index: 100;
 }
 
 
-/* Fire Camp - High contrast */
+/* Fire Camp - Simple style */
 .kd-label.fire {
-    background: rgba(255, 255, 255, 0.95);
+    background: #ffffff;
     border: 2px solid #000000;
     color: #000000;
 }
@@ -673,16 +666,16 @@ body {
 }
 
 .kd-label.fire:hover {
-    background: rgba(255, 255, 255, 0.98);
+    background: #ffffff;
     border-color: #000000;
     box-shadow: 
-        0 8px 20px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        0 8px 16px rgba(0, 0, 0, 0.2),
+        0 3px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Earth Camp - High contrast */
+/* Earth Camp - Simple style */
 .kd-label.earth {
-    background: rgba(255, 255, 255, 0.95);
+    background: #ffffff;
     border: 2px solid #000000;
     color: #000000;
 }
@@ -698,16 +691,16 @@ body {
 }
 
 .kd-label.earth:hover {
-    background: rgba(255, 255, 255, 0.98);
+    background: #ffffff;
     border-color: #000000;
     box-shadow: 
-        0 8px 20px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        0 8px 16px rgba(0, 0, 0, 0.2),
+        0 3px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Water Camp - High contrast */
+/* Water Camp - Simple style */
 .kd-label.water {
-    background: rgba(255, 255, 255, 0.95);
+    background: #ffffff;
     border: 2px solid #000000;
     color: #000000;
 }
@@ -723,16 +716,16 @@ body {
 }
 
 .kd-label.water:hover {
-    background: rgba(255, 255, 255, 0.98);
+    background: #ffffff;
     border-color: #000000;
     box-shadow: 
-        0 8px 20px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        0 8px 16px rgba(0, 0, 0, 0.2),
+        0 3px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Wind Camp - High contrast */
+/* Wind Camp - Simple style */
 .kd-label.wind {
-    background: rgba(255, 255, 255, 0.95);
+    background: #ffffff;
     border: 2px solid #000000;
     color: #000000;
 }
@@ -748,63 +741,13 @@ body {
 }
 
 .kd-label.wind:hover {
-    background: rgba(255, 255, 255, 0.98);
+    background: #ffffff;
     border-color: #000000;
     box-shadow: 
-        0 8px 20px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        0 8px 16px rgba(0, 0, 0, 0.2),
+        0 3px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Status indicators with pulsing animation */
-.kd-label.has-data {
-    animation: pulseGreen 2s ease-in-out infinite;
-    border-color: rgba(40, 167, 69, 0.6);
-    background: linear-gradient(135deg, 
-        rgba(40, 167, 69, 0.3) 0%, 
-        rgba(40, 167, 69, 0.2) 100%);
-}
-
-@keyframes pulseGreen {
-    0%, 100% {
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.1),
-            0 0 0 0 rgba(40, 167, 69, 0.4);
-    }
-    50% {
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.1),
-            0 0 0 6px rgba(40, 167, 69, 0);
-    }
-}
-
-.kd-label.partial-data {
-    animation: pulseYellow 2s ease-in-out infinite;
-    border-color: rgba(255, 193, 7, 0.6);
-    background: linear-gradient(135deg, 
-        rgba(255, 193, 7, 0.3) 0%, 
-        rgba(255, 193, 7, 0.2) 100%);
-}
-
-@keyframes pulseYellow {
-    0%, 100% {
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.1),
-            0 0 0 0 rgba(255, 193, 7, 0.4);
-    }
-    50% {
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.1),
-            0 0 0 6px rgba(255, 193, 7, 0);
-    }
-}
-
-.kd-label.no-data {
-    opacity: 0.7;
-    border-color: rgba(220, 53, 69, 0.3);
-    background: linear-gradient(135deg, 
-        rgba(220, 53, 69, 0.15) 0%, 
-        rgba(220, 53, 69, 0.1) 100%);
-}
 
 /* Add subtle camp region indicators */
 .kd-labels-responsive::before {
