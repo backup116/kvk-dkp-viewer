@@ -1,0 +1,22 @@
+{
+  "name": "rok-dkp-tracker",
+  "version": "1.0.0",
+  "description": "Rise of Kingdoms KvK DKP Tracker",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 8080 -c-1",
+    "serve": "python -m http.server 8080",
+    "test": "echo \"Open test.html in browser to run tests\""
+  },
+  "keywords": [
+    "rise-of-kingdoms",
+    "dkp",
+    "kvk",
+    "tracker"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

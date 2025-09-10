@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rise of Kingdoms - KvK DKP Tracker</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="app">
+        <header class="main-header">
+            <div class="header-content">
+                <h1>🏰 Rise of Kingdoms - KvK DKP Tracker</h1>
+                <button id="adminLoginBtn" class="admin-login-btn">Admin Login 🔐</button>
+            </div>
+        </header>
+
+        <nav class="main-nav">
+            <button class="nav-btn active" data-view="rankings">📊 Rankings</button>
+            <button class="nav-btn" data-view="camps">📈 Camp Statistics</button>
+            <button class="nav-btn" data-view="events">🏆 Event Leaderboard</button>
+        </nav>
+
+        <main class="main-content">
+            <div id="rankingsView" class="view-panel active">
+                <div class="filters">
+                    <select id="eventFilter" class="filter-select">
+                        <option value="all">All Events</option>
+                        <option value="Pass 4*">Pass 4* - Thu, 11.9</option>
+                        <option value="Altar of darkness">Altar of darkness - Tue, 23.9</option>
+                        <option value="Pass 7">Pass 7 - Fri, 3.10</option>
+                        <option value="Pass 8">Pass 8 - Mon, 6.10</option>
+                        <option value="Great ziggurat">Great ziggurat - Sun, 12.10</option>
+                    </select>
+                    <select id="campFilter" class="filter-select">
+                        <option value="all">All Camps</option>
+                        <option value="Fire">🔥 Fire</option>
+                        <option value="Earth">🌍 Earth</option>
+                        <option value="Water">💧 Water</option>
+                        <option value="Wind">💨 Wind</option>
+                    </select>
+                </div>
+
+                <div class="rankings-table-container">
+                    <table id="rankingsTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>KD</th>
+                                <th>Camp</th>
+                                <th>Total DKP</th>
+                                <th>T5 Kills</th>
+                                <th>T4 Kills</th>
+                                <th>Deaths</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rankingsBody">
+                            <tr>
+                                <td colspan="7" class="loading">Loading rankings...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="campsView" class="view-panel">
+                <div class="camps-grid">
+                    <div class="camp-card fire">
+                        <h3>🔥 Fire Camp</h3>
+                        <div class="camp-stats">
+                            <div class="stat-row">
+                                <span>Total DKP:</span>
+                                <span id="fireDKP">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Kingdoms:</span>
+                                <span>1400, 1068, 1471, 2162, 2197, 1520</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Average DKP:</span>
+                                <span id="fireAvg">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="camp-card earth">
+                        <h3>🌍 Earth Camp</h3>
+                        <div class="camp-stats">
+                            <div class="stat-row">
+                                <span>Total DKP:</span>
+                                <span id="earthDKP">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Kingdoms:</span>
+                                <span>1244, 1694, 2944, 3590, 2546, 1014</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Average DKP:</span>
+                                <span id="earthAvg">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="camp-card water">
+                        <h3>💧 Water Camp</h3>
+                        <div class="camp-stats">
+                            <div class="stat-row">
+                                <span>Total DKP:</span>
+                                <span id="waterDKP">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Kingdoms:</span>
+                                <span>3554, 1896, 1569, 3152, 3596, 2711, 1267</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Average DKP:</span>
+                                <span id="waterAvg">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="camp-card wind">
+                        <h3>💨 Wind Camp</h3>
+                        <div class="camp-stats">
+                            <div class="stat-row">
+                                <span>Total DKP:</span>
+                                <span id="windDKP">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Kingdoms:</span>
+                                <span>2352, 2973, 1477, 1294, 1732, 2509, 1359</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Average DKP:</span>
+                                <span id="windAvg">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="camp-comparison">
+                    <h3>Camp Rankings</h3>
+                    <canvas id="campChart"></canvas>
+                </div>
+            </div>
+
+            <div id="eventsView" class="view-panel">
+                <div class="event-selector">
+                    <select id="eventSelect" class="filter-select">
+                        <option value="Pass 4*">Pass 4* - Thu, 11.9, 7:04</option>
+                        <option value="Altar of darkness">Altar of darkness - Tue, 23.9, 7:04</option>
+                        <option value="Pass 7">Pass 7 - Fri, 3.10, 7:04</option>
+                        <option value="Pass 8">Pass 8 - Mon, 6.10, 7:04</option>
+                        <option value="Great ziggurat">Great ziggurat - Sun, 12.10, 7:04</option>
+                    </select>
+                </div>
+                <div class="event-leaderboard">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>KD</th>
+                                <th>Camp</th>
+                                <th>Event DKP</th>
+                                <th>T5 Kills</th>
+                                <th>T4 Kills</th>
+                                <th>Deaths</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventLeaderboard">
+                            <tr>
+                                <td colspan="7" class="loading">Select an event to view leaderboard</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>🔐 Admin Login</h2>
+            <div class="login-form">
+                <label for="adminPassword">Enter Admin Password:</label>
+                <input type="password" id="adminPassword" placeholder="Enter password">
+                <div class="login-buttons">
+                    <button id="loginSubmit" class="btn-primary">Login</button>
+                    <button id="loginCancel" class="btn-secondary">Cancel</button>
+                </div>
+                <div id="loginError" class="error-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    
+    <!-- Chart.js for Camp Statistics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- SheetJS for Excel file parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/rankings.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

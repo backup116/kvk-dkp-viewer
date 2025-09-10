@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KvK Analytics Dashboard - RoK DKP Tracker</title>
+    <link rel="stylesheet" href="css/view-styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏆 KvK Analytics Dashboard</h1>
+            <div class="controls">
+                <select class="event-selector" id="eventFilter">
+                    <option value="cumulative">📊 Cumulative (All Events)</option>
+                    <option value="Pass 4*">Pass 4* - Thu, 11.9</option>
+                    <option value="Altar of darkness">Altar of darkness - Tue, 23.9</option>
+                    <option value="Pass 7">Pass 7 - Fri, 3.10</option>
+                    <option value="Pass 8">Pass 8 - Mon, 6.10</option>
+                    <option value="Great ziggurat">Great ziggurat - Sun, 12.10</option>
+                </select>
+                <button class="btn-refresh" id="refreshBtn">🔄 Refresh</button>
+                <span id="lastUpdated" class="last-updated"></span>
+            </div>
+        </div>
+
+        <!-- Camp Performance Section -->
+        <div class="section camp-performance">
+            <h2 class="section-title">Camp Wise Performance</h2>
+            <div class="camps-grid" id="campCards">
+                <!-- Camp cards will be dynamically generated here -->
+            </div>
+        </div>
+
+        <!-- Kingdom Performance Section -->
+        <div class="section kingdom-performance">
+            <div class="section-header">
+                <h2 class="section-title">Kingdom Wise Performance</h2>
+                <div class="toggle-group">
+                    <label>
+                        <input type="checkbox" id="keepCampsTogether" checked>
+                        Keep Camps Together
+                    </label>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="kingdomTable">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Kingdom</th>
+                            <th>Total DKP</th>
+                            <th>Kill Points</th>
+                            <th>T5 Kills</th>
+                            <th>T4 Kills</th>
+                            <th>Deaths</th>
+                            <th>Healed</th>
+                            <th>Players</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Kingdom rows will be dynamically generated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Player Stats Section -->
+        <div class="section player-stats">
+            <div class="section-header">
+                <h2 class="section-title">Top Players</h2>
+                <div class="filter-group">
+                    <select class="filter-select" id="kdFilter">
+                        <option value="">All Kingdoms</option>
+                    </select>
+                    <select class="filter-select" id="campFilter">
+                        <option value="">All Camps</option>
+                        <option value="Fire">🔥 Fire</option>
+                        <option value="Earth">🌍 Earth</option>
+                        <option value="Water">💧 Water</option>
+                        <option value="Wind">🌪️ Wind</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="playerTable">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Kingdom</th>
+                            <th>DKP</th>
+                            <th>Kill Points</th>
+                            <th>T5 Kills</th>
+                            <th>T4 Kills</th>
+                            <th>Deaths</th>
+                            <th>Healed</th>
+                            <th>Power</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Player rows will be dynamically generated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Loading data...</p>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/data-retriever.js"></script>
+    <script src="js/view.js"></script>
+</body>
+</html>
