@@ -1,21 +1,23 @@
 # Rise of Kingdoms - KvK DKP Tracker
 
-A web application for tracking Dragon Kill Points (DKP) in Rise of Kingdoms KvK events. Features an interactive map interface for admins to upload Excel/CSV data and public rankings display.
+A comprehensive web application for tracking Dragon Kill Points (DKP) and performance metrics during Kingdom vs Kingdom (KvK) events in Rise of Kingdoms.
 
 ## Features
 
 ### Public View
-- **Real-time Rankings**: View kingdom rankings by total DKP
+- **Real-time Rankings**: View kingdom rankings by DKP and Kill Points
 - **Camp Statistics**: Compare performance across Fire, Earth, Water, and Wind camps
-- **Event Leaderboards**: Filter rankings by specific events
-- **Auto-refresh**: Data updates every 30 seconds
+- **Event Leaderboards**: Filter rankings by specific events or view cumulative totals
+- **Player Details**: View individual player contributions and statistics
+- **Mobile Responsive**: Optimized for all device sizes
 
 ### Admin Dashboard (Password: kvk2001)
 - **Interactive Map**: Click on kingdom numbers to upload Excel/CSV data
-- **Excel/CSV Upload**: Drag-and-drop interface for before/after event scans (supports .xlsx, .xls, .csv)
-- **DKP Calculation**: Automatic calculation using formula: (T4 Kills × 5) + (T5 Kills × 10) + (Deaths × 15)
-- **Upload Status**: Visual indicators showing data completion status
-- **Analytics**: Charts showing upload progress and top kingdoms
+- **Excel/CSV Upload**: Direct event score upload (supports .xlsx, .xls, .csv)
+- **DKP Calculation**: Custom formula: (T4 Kills × 5) + (T5 Kills × 10) + (Deaths × 15)
+- **Kill Points**: Uses game's official "Total Kill Points" values
+- **Analytics Dashboard**: Visual charts showing camp performance and trends
+- **Data Management**: Clear event data or reset database
 
 ## Setup Instructions
 
@@ -78,22 +80,29 @@ service cloud.firestore {
 - **Column C**: Current Power
 - **Column D**: Highest Power
 - **Column E**: Deaths (used in DKP calculation)
-- **Column F**: Total Kill Points
+- **Column F**: Total Kill Points (Game's official value)
 - **Column G**: Resources Gathered
-- **Column H**: T5 (T5 kills - used in DKP calculation)
-- **Column I**: T4 (T4 kills - used in DKP calculation)
-- **Column J**: T3 (T3 kills)
-- **Column K**: T2 (T2 kills)
-- **Column L**: T1 (T1 kills)
+- **Column H**: T5 Kills (used in DKP calculation)
+- **Column I**: T4 Kills (used in DKP calculation)
+- **Column J**: T3 Kills
+- **Column K**: T2 Kills
+- **Column L**: T1 Kills
 - **Column M**: Alliance Helps
+- **Column N**: Healed (optional)
 
 ### CSV Format
-If using CSV, the file must have headers matching the column names above.
+If using CSV, the file must have headers:
+- Character ID, Username, Current Power, Highest Power, Deaths, Total Kill Points, Resources Gathered, T5, T4, T3, T2, T1, Alliance Helps, Healed
 
-## DKP Formula
+## Scoring System
+
+### DKP Formula (Custom)
 DKP = (T4 Kills × 5) + (T5 Kills × 10) + (Deaths × 15)
 
-Applied directly to the event scores in the uploaded file. Each file contains the deltas (changes) for that specific event, not cumulative totals.
+### Kill Points
+Uses the game's official "Total Kill Points" value directly from Column F (no calculation)
+
+**Note**: Each uploaded file contains event scores (deltas), not cumulative totals.
 
 ## Kingdom Distribution
 
@@ -121,21 +130,20 @@ Applied directly to the event scores in the uploaded file. Each file contains th
 
 ### For Admins
 
-1. Navigate to the main page
-2. Click "Admin Login" and enter password: `kvk2001`
+1. Navigate to `/admin.html`
+2. Enter password: `kvk2001`
 3. Click on any kingdom number on the interactive map
 4. Select the event from dropdown
-5. Upload "Before Event" Excel/CSV scan (.xlsx, .xls, or .csv)
-6. Upload "After Event" Excel/CSV scan (.xlsx, .xls, or .csv)
-7. Review DKP calculation preview
-8. Click "Calculate & Save" to store data
+5. Upload Excel/CSV file with event scores (.xlsx, .xls, or .csv)
+6. Review DKP calculation preview
+7. Click "Calculate & Save" to store data
 
 ### For Viewers
 
-1. Navigate to the main page
-2. View rankings, camp statistics, and event leaderboards
-3. Use filters to narrow down results
-4. Data refreshes automatically every 30 seconds
+1. Navigate to `/view.html` or main page
+2. View camp comparisons and kingdom rankings
+3. Filter by specific events or view cumulative totals
+4. Click on kingdoms to see detailed player statistics
 
 ## Technologies Used
 
