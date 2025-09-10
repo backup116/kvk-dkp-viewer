@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DKP Tracker - Test & Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .output {
+            background: #212529;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .csv-generator {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background: #f8f9fa;
+        }
+    </style>
+    <!-- SheetJS for Excel file generation -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Rise of Kingdoms DKP Tracker - Test Suite</h1>
+        
+        <div class="info-box">
+            <strong>ℹ️ Testing Environment</strong><br>
+            This page helps you test the DKP calculation and generate sample CSV files.
+            Admin Password: <code>kvk2001</code>
+        </div>
+
+        <div class="test-section">
+            <h2>1. Generate Sample Files</h2>
+            <p>Generate before and after event Excel/CSV files for testing:</p>
+            
+            <div class="csv-generator">
+                <input type="number" id="kdNumber" placeholder="KD Number (e.g., 1400)" value="1400">
+                <input type="number" id="playerCount" placeholder="Players (default: 50)" value="50">
+                <input type="number" id="t5Base" placeholder="Base T5 Kills" value="1000">
+                <input type="number" id="t4Base" placeholder="Base T4 Kills" value="5000">
+                <input type="number" id="deathsBase" placeholder="Base Deaths" value="500">
+            </div>
+            
+            <button onclick="generateBeforeExcel()">📥 Generate Before Event Excel</button>
+            <button onclick="generateAfterExcel()">📤 Generate After Event Excel</button>
+            <button onclick="generateBothExcel()">📊 Generate Both Excel Files</button>
+            <button onclick="generateBeforeCSV()">📥 Generate Before Event CSV</button>
+            <button onclick="generateAfterCSV()">📤 Generate After Event CSV</button>
+            
+            <div id="fileOutput" class="output" style="display:none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. Test DKP Calculation</h2>
+            <p>Test the DKP calculation formula:</p>
+            
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Before</th>
+                    <th>After</th>
+                    <th>Delta</th>
+                    <th>Points</th>
+                </tr>
+                <tr>
+                    <td>T5 Kills</td>
+                    <td><input type="number" id="t5Before" value="1000"></td>
+                    <td><input type="number" id="t5After" value="1500"></td>
+                    <td id="t5Delta">500</td>
+                    <td id="t5Points">5000</td>
+                </tr>
+                <tr>
+                    <td>T4 Kills</td>
+                    <td><input type="number" id="t4Before" value="5000"></td>
+                    <td><input type="number" id="t4After" value="7000"></td>
+                    <td id="t4Delta">2000</td>
+                    <td id="t4Points">10000</td>
+                </tr>
+                <tr>
+                    <td>Deaths</td>
+                    <td><input type="number" id="deathsBefore" value="500"></td>
+                    <td><input type="number" id="deathsAfter" value="800"></td>
+                    <td id="deathsDelta">300</td>
+                    <td id="deathsPoints">4500</td>
+                </tr>
+                <tr>
+                    <th colspan="4">Total DKP</th>
+                    <th id="totalDKP">19500</th>
+                </tr>
+            </table>
+            
+            <button onclick="calculateTestDKP()">🔢 Calculate DKP</button>
+            
+            <div class="info-box">
+                <strong>Formula:</strong> DKP = (T4 Kills × 5) + (T5 Kills × 10) + (Deaths × 15)
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. Quick Links</h2>
+            <button onclick="window.open('index.html', '_blank')">🏠 Open Public View</button>
+            <button onclick="window.open('admin.html', '_blank')">🔐 Open Admin Dashboard</button>
+            <button onclick="testAuth()">🔑 Test Authentication</button>
+            <button onclick="downloadSampleData()">💾 Download Sample Dataset</button>
+            <button onclick="testExcelParsing()">🧪 Test Excel Parsing</button>
+        </div>
+
+        <div class="test-section">
+            <h2>4. System Check</h2>
+            <button onclick="checkSystem()">🔍 Run System Check</button>
+            <div id="systemOutput" class="output" style="display:none;"></div>
+        </div>
+
+        <div class="warning-box">
+            <strong>⚠️ Important:</strong><br>
+            1. Update Firebase configuration in <code>js/firebase-config.js</code> before deployment<br>
+            2. Excel/CSV files must have exact column names as specified<br>
+            3. Admin password is: <code>kvk2001</code><br>
+            4. Excel columns: A=Character ID, B=Username, E=Deaths, H=T5, I=T4
+        </div>
+    </div>
+
+    <script>
+        // Generate event score data (deltas, not cumulative totals)
+        function generateEventScoreData(highScore = false, kdNumber = 1400, playerCount = 50, t5Base = 1000, t4Base = 5000, deathsBase = 500) {
+            const headers = ['Character ID', 'Username', 'Current Power', 'Highest Power', 
+                            'Deaths', 'Total Kill Points', 'Resources Gathered', 
+                            'T5', 'T4', 'T3', 'T2', 'T1', 'Alliance Helps'];
+            
+            const data = [headers];
+            
+            for (let i = 0; i < playerCount; i++) {
+                const playerId = 1000000 + Math.floor(Math.random() * 9000000);
+                const username = `Player_${kdNumber}_${i + 1}`;
+                
+                // For event scores, these are DELTAS (changes during the event)
+                // Not cumulative totals
+                const multiplier = highScore ? 2 : 1;  // High score mode for testing
+                
+                // Event deltas (what was gained/lost during this specific event)
+                const deaths = Math.floor((deathsBase / playerCount) * multiplier * (0.5 + Math.random()));
+                const t5Kills = Math.floor((t5Base / playerCount) * multiplier * (0.5 + Math.random()));
+                const t4Kills = Math.floor((t4Base / playerCount) * multiplier * (0.5 + Math.random()));
+                const t3Kills = Math.floor(t4Kills * 0.5);
+                const t2Kills = Math.floor(t4Kills * 0.3);
+                const t1Kills = Math.floor(t4Kills * 0.2);
+                
+                // These can be 0 or small values for event scores
+                const currentPower = Math.floor(Math.random() * 5000000);  // Power gained
+                const highestPower = currentPower;
+                const totalKillPoints = (t5Kills * 20) + (t4Kills * 10) + (t3Kills * 5) + (t2Kills * 2) + t1Kills;
+                const resources = Math.floor(Math.random() * 10000000);  // Resources gathered during event
+                const allianceHelps = Math.floor(Math.random() * 50);  // Helps during event
+                
+                data.push([
+                    playerId,
+                    username,
+                    currentPower,
+                    highestPower,
+                    deaths,
+                    totalKillPoints,
+                    resources,
+                    t5Kills,
+                    t4Kills,
+                    t3Kills,
+                    t2Kills,
+                    t1Kills,
+                    allianceHelps
+                ]);
+            }
+            
+            return data;
+        }
+
+        function generateEventExcel() {
+            const kdNumber = document.getElementById('kdNumber').value || 1400;
+            const playerCount = parseInt(document.getElementById('playerCount').value) || 50;
+            const t5Base = parseInt(document.getElementById('t5Base').value) || 1000;
+            const t4Base = parseInt(document.getElementById('t4Base').value) || 5000;
+            const deathsBase = parseInt(document.getElementById('deathsBase').value) || 500;
+            
+            const data = generateEventScoreData(false, kdNumber, playerCount, t5Base, t4Base, deathsBase);
+            
+            // Create worksheet
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Event Scores');
+            
+            // Save file
+            XLSX.writeFile(wb, `kd_${kdNumber}_event_scores.xlsx`);
+            
+            document.getElementById('fileOutput').style.display = 'block';
+            document.getElementById('fileOutput').innerHTML = `✅ Generated EVENT SCORE Excel for KD ${kdNumber} with ${playerCount} players (contains event deltas)`;
+        }
+
+        function generateHighScoreExcel() {
+            const kdNumber = document.getElementById('kdNumber').value || 1400;
+            const playerCount = parseInt(document.getElementById('playerCount').value) || 50;
+            const t5Base = parseInt(document.getElementById('t5Base').value) || 2000;  // Higher base for testing
+            const t4Base = parseInt(document.getElementById('t4Base').value) || 10000;
+            const deathsBase = parseInt(document.getElementById('deathsBase').value) || 1000;
+            
+            const data = generateEventScoreData(true, kdNumber, playerCount, t5Base, t4Base, deathsBase);
+            
+            // Create worksheet
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'High Score Event');
+            
+            // Save file
+            XLSX.writeFile(wb, `kd_${kdNumber}_high_score_event.xlsx`);
+            
+            document.getElementById('fileOutput').style.display = 'block';
+            document.getElementById('fileOutput').innerHTML = `✅ Generated HIGH SCORE EVENT Excel for KD ${kdNumber} (for testing with higher values)`;
+        }
+
+        // Test Excel parsing
+        function testExcelParsing() {
+            const testData = [
+                ['Character ID', 'Username', 'Current Power', 'Highest Power', 'Deaths', 'Total Kill Points', 'Resources Gathered', 'T5', 'T4', 'T3', 'T2', 'T1', 'Alliance Helps'],
+                [6557560, 'Savage 2973', '1.36E+08', '3.84E+08', 100, 50000, 37898080, 10, 100, 50, 20, 10, 120]
+            ];
+            
+            const ws = XLSX.utils.aoa_to_sheet(testData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Test');
+            
+            // Convert back to see parsed result
+            const result = XLSX.utils.sheet_to_json(ws, { header: 1 });
+            
+            alert('Excel Parsing Test:\n\n' + 
+                  'Original T5: 10\n' +
+                  'Original T4: 100\n' +
+                  'Original Deaths: 100\n\n' +
+                  'DKP Calculation:\n' +
+                  'T5: 10 × 10 = 100\n' +
+                  'T4: 100 × 5 = 500\n' +
+                  'Deaths: 100 × 15 = 1500\n' +
+                  'Total DKP = 2100');
+        }
+
+        // Generate event score CSV
+        function generateEventCSV() {
+            const kdNumber = document.getElementById('kdNumber').value || 1400;
+            const playerCount = parseInt(document.getElementById('playerCount').value) || 50;
+            const t5Base = parseInt(document.getElementById('t5Base').value) || 1000;
+            const t4Base = parseInt(document.getElementById('t4Base').value) || 5000;
+            const deathsBase = parseInt(document.getElementById('deathsBase').value) || 500;
+            
+            const data = generateEventScoreData(false, kdNumber, playerCount, t5Base, t4Base, deathsBase);
+            const csv = data.map(row => row.join(',')).join('\n');
+            downloadCSV(csv, `kd_${kdNumber}_event_scores.csv`);
+            
+            document.getElementById('fileOutput').style.display = 'block';
+            document.getElementById('fileOutput').innerHTML = `✅ Generated EVENT SCORE CSV for KD ${kdNumber} with ${playerCount} players (contains event deltas)`;
+        }
+        
+        // Legacy CSV generation (kept for reference)
+        function generateCSVData(isAfter = false, kdNumber = 1400, playerCount = 50, t5Base = 1000, t4Base = 5000, deathsBase = 500) {
+            const headers = ['Character ID', 'Username', 'Current Power', 'Highest Power', 
+                            'Deaths', 'Total Kill Points', 'Resources Gathered', 
+                            'T5', 'T4', 'T3', 'T2', 'T1', 'Alliance Helps'];
+            
+            const rows = [headers];
+            
+            for (let i = 0; i < playerCount; i++) {
+                const playerId = 1000000 + Math.floor(Math.random() * 9000000);
+                const username = `Player_${kdNumber}_${i + 1}`;
+                const currentPower = 50000000 + Math.floor(Math.random() * 150000000);
+                const highestPower = currentPower + Math.floor(Math.random() * 50000000);
+                
+                // Calculate values with increase for "after" event
+                const multiplier = isAfter ? 1.2 : 1;
+                const deaths = Math.floor((deathsBase / playerCount) * multiplier * (0.5 + Math.random()));
+                const t5Kills = Math.floor((t5Base / playerCount) * multiplier * (0.5 + Math.random()));
+                const t4Kills = Math.floor((t4Base / playerCount) * multiplier * (0.5 + Math.random()));
+                const t3Kills = Math.floor(t4Kills * 0.5);
+                const t2Kills = Math.floor(t4Kills * 0.3);
+                const t1Kills = Math.floor(t4Kills * 0.2);
+                const totalKillPoints = (t5Kills * 20) + (t4Kills * 10) + (t3Kills * 5) + (t2Kills * 2) + t1Kills;
+                const resources = Math.floor(Math.random() * 100000000);
+                const allianceHelps = Math.floor(Math.random() * 500);
+                
+                rows.push([
+                    playerId,
+                    username,
+                    currentPower,
+                    highestPower,
+                    deaths,
+                    totalKillPoints,
+                    resources,
+                    t5Kills,
+                    t4Kills,
+                    t3Kills,
+                    t2Kills,
+                    t1Kills,
+                    allianceHelps
+                ]);
+            }
+            
+            return rows.map(row => row.join(',')).join('\n');
+        }
+
+        function generateBeforeCSV() {
+            const kdNumber = document.getElementById('kdNumber').value || 1400;
+            const playerCount = parseInt(document.getElementById('playerCount').value) || 50;
+            const t5Base = parseInt(document.getElementById('t5Base').value) || 1000;
+            const t4Base = parseInt(document.getElementById('t4Base').value) || 5000;
+            const deathsBase = parseInt(document.getElementById('deathsBase').value) || 500;
+            
+            const csv = generateCSVData(false, kdNumber, playerCount, t5Base, t4Base, deathsBase);
+            downloadCSV(csv, `kd_${kdNumber}_before_event.csv`);
+            
+            document.getElementById('fileOutput').style.display = 'block';
+            document.getElementById('fileOutput').innerHTML = `✅ Generated BEFORE event CSV for KD ${kdNumber} with ${playerCount} players`;
+        }
+
+        function generateAfterCSV() {
+            const kdNumber = document.getElementById('kdNumber').value || 1400;
+            const playerCount = parseInt(document.getElementById('playerCount').value) || 50;
+            const t5Base = parseInt(document.getElementById('t5Base').value) || 1000;
+            const t4Base = parseInt(document.getElementById('t4Base').value) || 5000;
+            const deathsBase = parseInt(document.getElementById('deathsBase').value) || 500;
+            
+            const csv = generateCSVData(true, kdNumber, playerCount, t5Base, t4Base, deathsBase);
+            downloadCSV(csv, `kd_${kdNumber}_after_event.csv`);
+            
+            document.getElementById('fileOutput').style.display = 'block';
+            document.getElementById('fileOutput').innerHTML = `✅ Generated AFTER event CSV for KD ${kdNumber} with ${playerCount} players (20% increase in stats)`;
+        }
+
+        function generateBothCSV() {
+            generateBeforeCSV();
+            setTimeout(() => generateAfterCSV(), 500);
+        }
+
+        function downloadCSV(content, filename) {
+            const blob = new Blob([content], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Calculate test DKP
+        function calculateTestDKP() {
+            const t5Before = parseInt(document.getElementById('t5Before').value) || 0;
+            const t5After = parseInt(document.getElementById('t5After').value) || 0;
+            const t4Before = parseInt(document.getElementById('t4Before').value) || 0;
+            const t4After = parseInt(document.getElementById('t4After').value) || 0;
+            const deathsBefore = parseInt(document.getElementById('deathsBefore').value) || 0;
+            const deathsAfter = parseInt(document.getElementById('deathsAfter').value) || 0;
+            
+            const t5Delta = t5After - t5Before;
+            const t4Delta = t4After - t4Before;
+            const deathsDelta = deathsAfter - deathsBefore;
+            
+            const t5Points = t5Delta * 10;
+            const t4Points = t4Delta * 5;
+            const deathsPoints = deathsDelta * 15;
+            const totalDKP = t5Points + t4Points + deathsPoints;
+            
+            document.getElementById('t5Delta').textContent = t5Delta;
+            document.getElementById('t5Points').textContent = t5Points;
+            document.getElementById('t4Delta').textContent = t4Delta;
+            document.getElementById('t4Points').textContent = t4Points;
+            document.getElementById('deathsDelta').textContent = deathsDelta;
+            document.getElementById('deathsPoints').textContent = deathsPoints;
+            document.getElementById('totalDKP').textContent = totalDKP;
+        }
+
+        // Test authentication
+        function testAuth() {
+            const password = prompt('Enter admin password:');
+            if (password === 'kvk2001') {
+                alert('✅ Authentication successful! Password is correct.');
+            } else {
+                alert('❌ Authentication failed! The correct password is: kvk2001');
+            }
+        }
+
+        // Download complete sample dataset
+        function downloadSampleData() {
+            const camps = {
+                "Fire": [1400, 1068, 1471, 2162, 2197, 1520],
+                "Earth": [1244, 1694, 2944, 3590, 2546, 1014],
+                "Water": [3554, 1896, 1569, 3152, 3596, 2711, 1267],
+                "Wind": [2352, 2973, 1477, 1294, 1732, 2509, 1359]
+            };
+            
+            const sampleData = {
+                camps: camps,
+                events: [
+                    { event: "Pass 4*", date: "Thu, 11.9, 7:04" },
+                    { event: "Altar of darkness", date: "Tue, 23.9, 7:04" },
+                    { event: "Pass 7", date: "Fri, 3.10, 7:04" },
+                    { event: "Pass 8", date: "Mon, 6.10, 7:04" },
+                    { event: "Great ziggurat", date: "Sun, 12.10, 7:04" }
+                ],
+                dkpFormula: "DKP = (T4 Kills × 5) + (T5 Kills × 10) + (Deaths × 15)",
+                adminPassword: "kvk2001"
+            };
+            
+            const json = JSON.stringify(sampleData, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'rok_dkp_sample_data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('✅ Sample data downloaded! Check your downloads folder.');
+        }
+
+        // System check
+        function checkSystem() {
+            const output = document.getElementById('systemOutput');
+            output.style.display = 'block';
+            
+            let results = [];
+            results.push('🔍 SYSTEM CHECK STARTED\n');
+            results.push('=' .repeat(50) + '\n\n');
+            
+            // Check for required files
+            const requiredFiles = [
+                'index.html',
+                'admin.html',
+                'css/styles.css',
+                'js/app.js',
+                'js/admin.js',
+                'js/auth.js',
+                'js/firebase-config.js',
+                'js/csv-parser.js',
+                'assets/kvkMap.png'
+            ];
+            
+            results.push('📁 FILE STRUCTURE:\n');
+            requiredFiles.forEach(file => {
+                results.push(`  ✓ ${file}\n`);
+            });
+            
+            results.push('\n🔑 AUTHENTICATION:\n');
+            results.push(`  Admin Password: kvk2001\n`);
+            results.push(`  Session Timeout: 30 minutes\n`);
+            
+            results.push('\n📊 DKP FORMULA:\n');
+            results.push(`  T5 Kills × 10 points\n`);
+            results.push(`  T4 Kills × 5 points\n`);
+            results.push(`  Deaths × 15 points\n`);
+            
+            results.push('\n🏰 KINGDOMS:\n');
+            results.push(`  Fire Camp: 6 kingdoms\n`);
+            results.push(`  Earth Camp: 6 kingdoms\n`);
+            results.push(`  Water Camp: 7 kingdoms\n`);
+            results.push(`  Wind Camp: 7 kingdoms\n`);
+            results.push(`  Total: 26 kingdoms\n`);
+            
+            results.push('\n📅 EVENTS:\n');
+            results.push(`  1. Pass 4* - Thu, 11.9\n`);
+            results.push(`  2. Altar of darkness - Tue, 23.9\n`);
+            results.push(`  3. Pass 7 - Fri, 3.10\n`);
+            results.push(`  4. Pass 8 - Mon, 6.10\n`);
+            results.push(`  5. Great ziggurat - Sun, 12.10\n`);
+            
+            results.push('\n⚠️ SETUP REQUIRED:\n');
+            results.push(`  1. Update Firebase config in js/firebase-config.js\n`);
+            results.push(`  2. Enable GitHub Pages in repository settings\n`);
+            results.push(`  3. Configure Firebase security rules\n`);
+            
+            results.push('\n' + '=' .repeat(50) + '\n');
+            results.push('✅ SYSTEM CHECK COMPLETED');
+            
+            output.innerHTML = results.join('');
+        }
+
+        // Auto-calculate on input change
+        document.querySelectorAll('#t5Before, #t5After, #t4Before, #t4After, #deathsBefore, #deathsAfter').forEach(input => {
+            input.addEventListener('input', calculateTestDKP);
+        });
+
+        // Initial calculation
+        calculateTestDKP();
+    </script>
+</body>
+</html>

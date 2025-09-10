@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Test Excel</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <h1>Test Excel Generator</h1>
+    <button onclick="generateTestExcel()">Generate Test Excel</button>
+    
+    <script>
+    function generateTestExcel() {
+        // Headers matching the expected format
+        const headers = ['Character ID', 'Username', 'Current Power', 'Highest Power', 
+                        'Deaths', 'Total Kill Points', 'Resources Gathered', 
+                        'T5', 'T4', 'T3', 'T2', 'T1', 'Alliance Helps', 'Healed'];
+        
+        // Sample data with different Kill Points vs calculated values
+        // Player 1: KP=50000, but T5(100)×20 + T4(1000)×10 = 12000 (different!)
+        // Player 2: KP=25000, but T5(50)×20 + T4(500)×10 = 6000 (different!)
+        // This will test if we're using the game's KP (50000, 25000) not our calculation
+        const sampleData = [
+            ['6557560', 'TestPlayer1', 136444215, 384305025, 1000, 50000, 37898080, 100, 1000, 500, 200, 100, 120, 5000],
+            ['33290409', 'TestPlayer2', 117086867, 181847440, 500, 25000, 11313353, 50, 500, 250, 100, 50, 18, 2500],
+            ['34946882', 'TestPlayer3', 114582710, 204785563, 750, 30000, 0, 75, 750, 375, 150, 75, 13, 3750]
+        ];
+        
+        // Create worksheet
+        const ws = XLSX.utils.aoa_to_sheet([headers, ...sampleData]);
+        
+        // Create workbook
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Event Stats');
+        
+        // Save file
+        XLSX.writeFile(wb, 'test_event_data.xlsx');
+        
+        console.log('Test Excel file created!');
+        console.log('Expected Kill Points: 50000, 25000, 30000 (from column F)');
+        console.log('Expected DKP calculation:');
+        console.log('- Player 1: T5(100)×10 + T4(1000)×5 + Deaths(1000)×15 = 1000 + 5000 + 15000 = 21000');
+        console.log('- Player 2: T5(50)×10 + T4(500)×5 + Deaths(500)×15 = 500 + 2500 + 7500 = 10500');
+        console.log('- Player 3: T5(75)×10 + T4(750)×5 + Deaths(750)×15 = 750 + 3750 + 11250 = 15750');
+        console.log('Total Kill Points should be: 105000 (sum of game values)');
+        console.log('Total DKP should be: 47250 (sum of our formula)');
+    }
+    </script>
+</body>
+</html>
