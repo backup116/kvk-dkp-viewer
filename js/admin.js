@@ -52,24 +52,16 @@ function setupAdminNavigation() {
 
 // Setup interactive map
 function setupMapInteractions() {
-    // Setup clickable KD labels
+    // Setup clickable KD labels - now works with percentage-based responsive positioning
     const kdLabels = document.querySelectorAll('.kd-label');
     
     kdLabels.forEach(label => {
         label.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             const kdNumber = label.dataset.kd;
-            openUploadModal(kdNumber);
-        });
-    });
-    
-    // Setup image map areas
-    const mapAreas = document.querySelectorAll('area');
-    
-    mapAreas.forEach(area => {
-        area.addEventListener('click', (e) => {
-            e.preventDefault();
-            const kdNumber = area.dataset.kd;
+            const camp = label.dataset.camp;
+            console.log(`Clicked KD ${kdNumber} from ${camp} camp`);
             openUploadModal(kdNumber);
         });
     });

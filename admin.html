@@ -34,78 +34,43 @@
                 </div>
                 
                 <div class="map-container">
-                    <img src="assets/KvKMap.png" alt="KvK Map" usemap="#kdMap" class="interactive-map">
-                    <map name="kdMap" id="kdMap">
-                        <!-- Fire Camp KDs -->
-                        <area shape="rect" coords="139,194,180,220" data-kd="1400" data-camp="Fire" href="#" alt="KD 1400">
-                        <area shape="rect" coords="190,194,230,220" data-kd="1068" data-camp="Fire" href="#" alt="KD 1068">
-                        <area shape="rect" coords="240,194,280,220" data-kd="1471" data-camp="Fire" href="#" alt="KD 1471">
-                        <area shape="rect" coords="290,194,330,220" data-kd="2162" data-camp="Fire" href="#" alt="KD 2162">
-                        <area shape="rect" coords="340,194,380,220" data-kd="2197" data-camp="Fire" href="#" alt="KD 2197">
-                        <area shape="rect" coords="139,230,180,260" data-kd="1520" data-camp="Fire" href="#" alt="KD 1520">
-                        
-                        <!-- Earth Camp KDs -->
-                        <area shape="rect" coords="840,200,880,230" data-kd="1244" data-camp="Earth" href="#" alt="KD 1244">
-                        <area shape="rect" coords="890,200,930,230" data-kd="1694" data-camp="Earth" href="#" alt="KD 1694">
-                        <area shape="rect" coords="940,200,980,230" data-kd="2944" data-camp="Earth" href="#" alt="KD 2944">
-                        <area shape="rect" coords="990,200,1030,230" data-kd="3590" data-camp="Earth" href="#" alt="KD 3590">
-                        <area shape="rect" coords="840,240,880,270" data-kd="2546" data-camp="Earth" href="#" alt="KD 2546">
-                        <area shape="rect" coords="890,240,930,270" data-kd="1014" data-camp="Earth" href="#" alt="KD 1014">
-                        
-                        <!-- Water Camp KDs -->
-                        <area shape="rect" coords="121,689,161,719" data-kd="3554" data-camp="Water" href="#" alt="KD 3554">
-                        <area shape="rect" coords="171,689,211,719" data-kd="1896" data-camp="Water" href="#" alt="KD 1896">
-                        <area shape="rect" coords="221,689,261,719" data-kd="1569" data-camp="Water" href="#" alt="KD 1569">
-                        <area shape="rect" coords="271,689,311,719" data-kd="3152" data-camp="Water" href="#" alt="KD 3152">
-                        <area shape="rect" coords="321,689,361,719" data-kd="3596" data-camp="Water" href="#" alt="KD 3596">
-                        <area shape="rect" coords="121,729,161,759" data-kd="2711" data-camp="Water" href="#" alt="KD 2711">
-                        <area shape="rect" coords="171,729,211,759" data-kd="1267" data-camp="Water" href="#" alt="KD 1267">
-                        
-                        <!-- Wind Camp KDs -->
-                        <area shape="rect" coords="824,667,864,697" data-kd="2352" data-camp="Wind" href="#" alt="KD 2352">
-                        <area shape="rect" coords="874,667,914,697" data-kd="2973" data-camp="Wind" href="#" alt="KD 2973">
-                        <area shape="rect" coords="924,667,964,697" data-kd="1477" data-camp="Wind" href="#" alt="KD 1477">
-                        <area shape="rect" coords="974,667,1014,697" data-kd="1294" data-camp="Wind" href="#" alt="KD 1294">
-                        <area shape="rect" coords="1024,667,1064,697" data-kd="1732" data-camp="Wind" href="#" alt="KD 1732">
-                        <area shape="rect" coords="824,707,864,737" data-kd="2509" data-camp="Wind" href="#" alt="KD 2509">
-                        <area shape="rect" coords="874,707,914,737" data-kd="1359" data-camp="Wind" href="#" alt="KD 1359">
-                    </map>
+                    <img src="assets/KvKMap.png" alt="KvK Map" class="interactive-map">
                     
-                    <!-- KD Labels Overlay -->
-                    <div class="kd-labels">
-                        <!-- Fire KDs -->
-                        <div class="kd-label fire" style="left: 139px; top: 194px;" data-kd="1400">1400</div>
-                        <div class="kd-label fire" style="left: 190px; top: 194px;" data-kd="1068">1068</div>
-                        <div class="kd-label fire" style="left: 240px; top: 194px;" data-kd="1471">1471</div>
-                        <div class="kd-label fire" style="left: 290px; top: 194px;" data-kd="2162">2162</div>
-                        <div class="kd-label fire" style="left: 340px; top: 194px;" data-kd="2197">2197</div>
-                        <div class="kd-label fire" style="left: 139px; top: 230px;" data-kd="1520">1520</div>
+                    <!-- Responsive KD Labels Overlay - Organic City-like Distribution -->
+                    <div class="kd-labels-responsive">
+                        <!-- Fire Camp KDs (top-left) - Clustered Settlement Pattern -->
+                        <div class="kd-label fire" style="left: 10.5%; top: 19.8%; transform: translate(-50%, -50%) rotate(-2deg);" data-kd="1400" data-camp="Fire">1400</div>
+                        <div class="kd-label fire" style="left: 15.8%; top: 22.7%; transform: translate(-50%, -50%) rotate(1deg);" data-kd="1068" data-camp="Fire">1068</div>
+                        <div class="kd-label fire" style="left: 21.3%; top: 20.4%; transform: translate(-50%, -50%) rotate(-1deg);" data-kd="1471" data-camp="Fire">1471</div>
+                        <div class="kd-label fire" style="left: 18.9%; top: 25.8%; transform: translate(-50%, -50%) rotate(2deg);" data-kd="2162" data-camp="Fire">2162</div>
+                        <div class="kd-label fire" style="left: 26.2%; top: 23.1%; transform: translate(-50%, -50%) rotate(-3deg);" data-kd="2197" data-camp="Fire">2197</div>
+                        <div class="kd-label fire" style="left: 13.4%; top: 26.3%; transform: translate(-50%, -50%) rotate(1.5deg);" data-kd="1520" data-camp="Fire">1520</div>
                         
-                        <!-- Earth KDs -->
-                        <div class="kd-label earth" style="left: 840px; top: 200px;" data-kd="1244">1244</div>
-                        <div class="kd-label earth" style="left: 890px; top: 200px;" data-kd="1694">1694</div>
-                        <div class="kd-label earth" style="left: 940px; top: 200px;" data-kd="2944">2944</div>
-                        <div class="kd-label earth" style="left: 990px; top: 200px;" data-kd="3590">3590</div>
-                        <div class="kd-label earth" style="left: 840px; top: 240px;" data-kd="2546">2546</div>
-                        <div class="kd-label earth" style="left: 890px; top: 240px;" data-kd="1014">1014</div>
+                        <!-- Earth Camp KDs (top-right) - Mountain Settlement Pattern -->
+                        <div class="kd-label earth" style="left: 71.2%; top: 20.4%; transform: translate(-50%, -50%) rotate(2deg);" data-kd="1244" data-camp="Earth">1244</div>
+                        <div class="kd-label earth" style="left: 76.8%; top: 23.2%; transform: translate(-50%, -50%) rotate(-1.5deg);" data-kd="1694" data-camp="Earth">1694</div>
+                        <div class="kd-label earth" style="left: 82.3%; top: 19.7%; transform: translate(-50%, -50%) rotate(1deg);" data-kd="2944" data-camp="Earth">2944</div>
+                        <div class="kd-label earth" style="left: 85.7%; top: 24.8%; transform: translate(-50%, -50%) rotate(-2deg);" data-kd="3590" data-camp="Earth">3590</div>
+                        <div class="kd-label earth" style="left: 70.5%; top: 29.9%; transform: translate(-50%, -50%) rotate(3deg);" data-kd="2546" data-camp="Earth">2546</div>
+                        <div class="kd-label earth" style="left: 79.4%; top: 35.3%; transform: translate(-50%, -50%) rotate(-1deg);" data-kd="1014" data-camp="Earth">1014</div>
                         
-                        <!-- Water KDs -->
-                        <div class="kd-label water" style="left: 121px; top: 689px;" data-kd="3554">3554</div>
-                        <div class="kd-label water" style="left: 171px; top: 689px;" data-kd="1896">1896</div>
-                        <div class="kd-label water" style="left: 221px; top: 689px;" data-kd="1569">1569</div>
-                        <div class="kd-label water" style="left: 271px; top: 689px;" data-kd="3152">3152</div>
-                        <div class="kd-label water" style="left: 321px; top: 689px;" data-kd="3596">3596</div>
-                        <div class="kd-label water" style="left: 121px; top: 729px;" data-kd="2711">2711</div>
-                        <div class="kd-label water" style="left: 171px; top: 729px;" data-kd="1267">1267</div>
+                        <!-- Water Camp KDs (bottom-left) - Coastal Settlement Pattern -->
+                        <div class="kd-label water" style="left: 9.8%; top: 74.2%; transform: translate(-50%, -50%) rotate(-2deg);" data-kd="3554" data-camp="Water">3554</div>
+                        <div class="kd-label water" style="left: 15.3%; top: 76.8%; transform: translate(-50%, -50%) rotate(1.5deg);" data-kd="1896" data-camp="Water">1896</div>
+                        <div class="kd-label water" style="left: 20.7%; top: 73.9%; transform: translate(-50%, -50%) rotate(-1deg);" data-kd="1569" data-camp="Water">1569</div>
+                        <div class="kd-label water" style="left: 17.4%; top: 89.6%; transform: translate(-50%, -50%) rotate(2deg);" data-kd="3152" data-camp="Water">3152</div>
+                        <div class="kd-label water" style="left: 25.8%; top: 77.1%; transform: translate(-50%, -50%) rotate(-2.5deg);" data-kd="3596" data-camp="Water">3596</div>
+                        <div class="kd-label water" style="left: 9.6%; top: 85.4%; transform: translate(-50%, -50%) rotate(1deg);" data-kd="2711" data-camp="Water">2711</div>
+                        <div class="kd-label water" style="left: 22.3%; top: 81.2%; transform: translate(-50%, -50%) rotate(-1.5deg);" data-kd="1267" data-camp="Water">1267</div>
                         
-                        <!-- Wind KDs -->
-                        <div class="kd-label wind" style="left: 824px; top: 667px;" data-kd="2352">2352</div>
-                        <div class="kd-label wind" style="left: 874px; top: 667px;" data-kd="2973">2973</div>
-                        <div class="kd-label wind" style="left: 924px; top: 667px;" data-kd="1477">1477</div>
-                        <div class="kd-label wind" style="left: 974px; top: 667px;" data-kd="1294">1294</div>
-                        <div class="kd-label wind" style="left: 1024px; top: 667px;" data-kd="1732">1732</div>
-                        <div class="kd-label wind" style="left: 824px; top: 707px;" data-kd="2509">2509</div>
-                        <div class="kd-label wind" style="left: 874px; top: 707px;" data-kd="1359">1359</div>
+                        <!-- Wind Camp KDs (bottom-right) - Windswept Highland Pattern -->
+                        <div class="kd-label wind" style="left: 70.3%; top: 72.4%; transform: translate(-50%, -50%) rotate(2.5deg);" data-kd="2352" data-camp="Wind">2352</div>
+                        <div class="kd-label wind" style="left: 75.8%; top: 74.9%; transform: translate(-50%, -50%) rotate(-1deg);" data-kd="2973" data-camp="Wind">2973</div>
+                        <div class="kd-label wind" style="left: 81.2%; top: 71.8%; transform: translate(-50%, -50%) rotate(1.5deg);" data-kd="1477" data-camp="Wind">1477</div>
+                        <div class="kd-label wind" style="left: 84.6%; top: 76.3%; transform: translate(-50%, -50%) rotate(-2deg);" data-kd="1294" data-camp="Wind">1294</div>
+                        <div class="kd-label wind" style="left: 87.9%; top: 73.1%; transform: translate(-50%, -50%) rotate(3deg);" data-kd="1732" data-camp="Wind">1732</div>
+                        <div class="kd-label wind" style="left: 72.7%; top: 78.2%; transform: translate(-50%, -50%) rotate(-1.5deg);" data-kd="2509" data-camp="Wind">2509</div>
+                        <div class="kd-label wind" style="left: 78.3%; top: 79.8%; transform: translate(-50%, -50%) rotate(2deg);" data-kd="1359" data-camp="Wind">1359</div>
                     </div>
                 </div>
             </div>
