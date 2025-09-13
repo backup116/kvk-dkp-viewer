@@ -309,30 +309,16 @@ async function loadPlayerStats(eventFilter = 'cumulative', kdFilter = '', campFi
             
             players = Array.from(playerMap.values());
         } else {
-            // Get players for specific event
-            // Data structure: events/[eventName]/kingdoms/[kdNumber]/players/[playerId]
-            players = [];
+            // Get players for specific event using collectionGroup
+            // Since parent documents don't exist, we need to query players directly and filter
+            console.log(`Getting players for specific event: "${eventFilter}"`);
             
-            // Get all kingdoms for this event
-            const kingdomsSnapshot = await db.collection('events')
-                .doc(eventFilter)
-                .collection('kingdoms')
+            const playersSnapshot = await db.collectionGroup('players')
+                .where('eventName', '==', eventFilter)
                 .get();
             
-            // Get players from each kingdom
-            for (const kingdomDoc of kingdomsSnapshot.docs) {
-                const playersSnapshot = await db.collection('events')
-                    .doc(eventFilter)
-                    .collection('kingdoms')
-                    .doc(kingdomDoc.id)
-                    .collection('players')
-                    .get();
-                
-                playersSnapshot.forEach(playerDoc => {
-                    const playerData = playerDoc.data();
-                    players.push(playerData);
-                });
-            }
+            players = playersSnapshot.docs.map(doc => doc.data());
+            console.log(`Found ${players.length} players for event "${eventFilter}"`);
         }
         
         // Apply filters
