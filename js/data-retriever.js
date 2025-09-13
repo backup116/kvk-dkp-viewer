@@ -351,6 +351,181 @@ class DataRetriever {
         return result;
     }
 
+    // Get all kingdoms list
+    async getAllKingdoms() {
+        const cacheKey = 'all_kingdoms';
+        const cached = this.getFromCache(cacheKey);
+        if (cached) {
+            return cached;
+        }
+        
+        const kingdoms = [];
+        const snapshot = await this.db
+            .collection('aggregates')
+            .doc('cumulative')
+            .collection('kingdoms')
+            .get();
+        
+        snapshot.forEach(doc => {
+            kingdoms.push(parseInt(doc.id));
+        });
+        
+        kingdoms.sort((a, b) => a - b);
+        this.setCache(cacheKey, kingdoms);
+        return kingdoms;
+    }
+    
+    // Get player statistics
+    async getPlayerStats(eventFilter = 'cumulative', kdFilter = 'all', campFilter = 'all') {
+        const cacheKey = `players_${eventFilter}_${kdFilter}_${campFilter}`;
+        const cached = this.getFromCache(cacheKey);
+        if (cached) {
+            return cached;
+        }
+        
+        const allPlayers = [];
+        const playerMap = new Map(); // To aggregate players across events
+        
+        if (eventFilter === 'cumulative') {
+            // For cumulative, we need to aggregate players from all events
+            const events = ['Pass 4*', 'Altar of darkness', 'Pass 7', 'Pass 8', 'Great ziggurat'];
+            
+            // Get all kingdoms first to apply filters
+            const kingdomsSnapshot = await this.db
+                .collection('aggregates')
+                .doc('cumulative')
+                .collection('kingdoms')
+                .get();
+            
+            const validKingdoms = new Map();
+            kingdomsSnapshot.forEach(doc => {
+                const kdNumber = parseInt(doc.id);
+                const kdData = doc.data();
+                
+                // Apply filters
+                if (kdFilter !== 'all' && kdNumber !== parseInt(kdFilter)) {
+                    return;
+                }
+                if (campFilter !== 'all' && kdData.camp !== campFilter) {
+                    return;
+                }
+                
+                validKingdoms.set(kdNumber, kdData);
+            });
+            
+            // Now get players from all events for valid kingdoms
+            for (const event of events) {
+                for (const [kdNumber, kdData] of validKingdoms) {
+                    const playersSnapshot = await this.db
+                        .collection('events')
+                        .doc(event)
+                        .collection('kingdoms')
+                        .doc(kdNumber.toString())
+                        .collection('players')
+                        .get();
+                    
+                    playersSnapshot.forEach(playerDoc => {
+                        const playerData = playerDoc.data();
+                        const playerId = playerData.playerId || playerDoc.id;
+                        const existingPlayer = playerMap.get(playerId);
+                        
+                        if (existingPlayer) {
+                            // Aggregate player stats
+                            existingPlayer.t4Kills = (existingPlayer.t4Kills || 0) + (playerData.t4Kills || 0);
+                            existingPlayer.t5Kills = (existingPlayer.t5Kills || 0) + (playerData.t5Kills || 0);
+                            existingPlayer.deaths = (existingPlayer.deaths || 0) + (playerData.deaths || 0);
+                            existingPlayer.healed = (existingPlayer.healed || 0) + (playerData.healed || 0);
+                            existingPlayer.totalKillPoints = (existingPlayer.totalKillPoints || 0) + (playerData.killPoints || 0);
+                            existingPlayer.currentPower = Math.max(existingPlayer.currentPower || 0, playerData.power || 0);
+                        } else {
+                            // New player
+                            playerMap.set(playerId, {
+                                playerId: playerId,
+                                username: playerData.playerName || playerData.username || 'Unknown',
+                                kdNumber: kdNumber,
+                                camp: kdData.camp,
+                                currentPower: playerData.power || 0,
+                                t4Kills: playerData.t4Kills || 0,
+                                t5Kills: playerData.t5Kills || 0,
+                                deaths: playerData.deaths || 0,
+                                healed: playerData.healed || 0,
+                                totalKillPoints: playerData.killPoints || 0
+                            });
+                        }
+                    });
+                }
+            }
+            
+            // Convert map to array and calculate DKP
+            playerMap.forEach(player => {
+                player.dkpScore = (player.t5Kills || 0) * 10 + 
+                                 (player.t4Kills || 0) * 5 + 
+                                 (player.deaths || 0) * 15;
+                allPlayers.push(player);
+            });
+        } else {
+            // Get event-specific player data
+            // First get valid kingdoms based on filters
+            const kingdomsSnapshot = await this.db
+                .collection('aggregates')
+                .doc('cumulative')
+                .collection('kingdoms')
+                .get();
+            
+            const validKingdoms = new Map();
+            kingdomsSnapshot.forEach(doc => {
+                const kdNumber = parseInt(doc.id);
+                const kdData = doc.data();
+                
+                // Apply filters
+                if (kdFilter !== 'all' && kdNumber !== parseInt(kdFilter)) {
+                    return;
+                }
+                if (campFilter !== 'all' && kdData.camp !== campFilter) {
+                    return;
+                }
+                
+                validKingdoms.set(kdNumber, kdData);
+            });
+            
+            // Get players for this specific event
+            for (const [kdNumber, kdData] of validKingdoms) {
+                const playersSnapshot = await this.db
+                    .collection('events')
+                    .doc(eventFilter)
+                    .collection('kingdoms')
+                    .doc(kdNumber.toString())
+                    .collection('players')
+                    .get();
+                
+                playersSnapshot.forEach(playerDoc => {
+                    const playerData = playerDoc.data();
+                    allPlayers.push({
+                        playerId: playerData.playerId || playerDoc.id,
+                        username: playerData.playerName || playerData.username || 'Unknown',
+                        kdNumber: kdNumber,
+                        camp: kdData.camp,
+                        currentPower: playerData.power || 0,
+                        t4Kills: playerData.t4Kills || 0,
+                        t5Kills: playerData.t5Kills || 0,
+                        deaths: playerData.deaths || 0,
+                        healed: playerData.healed || 0,
+                        totalKillPoints: playerData.killPoints || 0,
+                        dkpScore: (playerData.t5Kills || 0) * 10 + 
+                                 (playerData.t4Kills || 0) * 5 + 
+                                 (playerData.deaths || 0) * 15
+                    });
+                });
+            }
+        }
+        
+        // Sort players by DKP score
+        allPlayers.sort((a, b) => (b.dkpScore || 0) - (a.dkpScore || 0));
+        
+        this.setCache(cacheKey, allPlayers);
+        return allPlayers;
+    }
+    
     // Get camp comparison data
     async getCampComparison(eventFilter = 'cumulative') {
         const campData = await this.getCampPerformance(eventFilter);

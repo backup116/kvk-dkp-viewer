@@ -5,6 +5,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     
+    // Initialize data retriever globally
+    if (!window.dataRetriever) {
+        window.dataRetriever = new DataRetriever();
+    }
+    
     // Hide Manage tab for limited users
     if (!authManager.canManageData()) {
         const manageTab = document.querySelector('[data-view="manage"]');
@@ -62,8 +67,7 @@ function setupAdminNavigation() {
             } else if (targetView === 'rankings') {
                 loadRankings();
             } else if (targetView === 'players') {
-                // Redirect to main site with players tab
-                window.open('index.html#players', '_blank');
+                loadPlayerStats();
             } else if (targetView === 'analytics') {
                 loadAnalytics();
             }
@@ -410,11 +414,6 @@ let dkpTrendsChart = null;
 // Load rankings data
 async function loadRankings() {
     try {
-        // Initialize data retriever if not exists
-        if (!window.dataRetriever) {
-            window.dataRetriever = new DataRetriever();
-        }
-        
         const eventFilter = document.getElementById('rankingsEventFilter');
         const tbody = document.getElementById('rankingsTableBody');
         
@@ -505,6 +504,133 @@ function getCampIcon(camp) {
     return icons[camp] || '';
 }
 
+
+// Load player statistics
+async function loadPlayerStats() {
+    try {
+        const tbody = document.getElementById('playersTableBody');
+        const eventFilter = document.getElementById('playerEventFilter');
+        const kdFilter = document.getElementById('playerKdFilter');
+        const campFilter = document.getElementById('playerCampFilter');
+        const refreshBtn = document.getElementById('refreshPlayerStats');
+        
+        // Setup event listeners if not already set
+        if (eventFilter && !eventFilter.hasListener) {
+            eventFilter.addEventListener('change', () => loadPlayerStats());
+            eventFilter.hasListener = true;
+        }
+        
+        if (kdFilter && !kdFilter.hasListener) {
+            kdFilter.addEventListener('change', () => loadPlayerStats());
+            kdFilter.hasListener = true;
+        }
+        
+        if (campFilter && !campFilter.hasListener) {
+            campFilter.addEventListener('change', () => loadPlayerStats());
+            campFilter.hasListener = true;
+        }
+        
+        if (refreshBtn && !refreshBtn.hasListener) {
+            refreshBtn.addEventListener('click', () => {
+                if (window.dataRetriever) {
+                    window.dataRetriever.clearCache();
+                }
+                loadPlayerStats();
+            });
+            refreshBtn.hasListener = true;
+        }
+        
+        // Show loading state
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Loading player stats...</td></tr>';
+        }
+        
+        // Get filter values
+        const selectedEvent = eventFilter ? eventFilter.value : 'cumulative';
+        const selectedKd = kdFilter ? kdFilter.value : 'all';
+        const selectedCamp = campFilter ? campFilter.value : 'all';
+        
+        // Fetch player data
+        if (window.dataRetriever) {
+            const players = await window.dataRetriever.getPlayerStats(selectedEvent, selectedKd, selectedCamp);
+            
+            // Update kingdom dropdown if needed
+            if (kdFilter && kdFilter.options.length <= 1) {
+                const kingdoms = await window.dataRetriever.getAllKingdoms();
+                kdFilter.innerHTML = '<option value="all">All Kingdoms</option>';
+                kingdoms.forEach(kd => {
+                    const option = document.createElement('option');
+                    option.value = kd;
+                    option.textContent = `Kingdom ${kd}`;
+                    kdFilter.appendChild(option);
+                });
+            }
+            
+            // Clear and populate table
+            if (tbody) {
+                tbody.innerHTML = '';
+                
+                if (players && players.length > 0) {
+                    players.forEach((player, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td>${player.username || 'Unknown'}</td>
+                            <td>${player.kdNumber || '-'}</td>
+                            <td>${formatNumber(player.currentPower || 0)}</td>
+                            <td>${formatNumber(player.totalKillPoints || 0)}</td>
+                            <td>${formatNumber(player.t5Kills || 0)}</td>
+                            <td>${formatNumber(player.t4Kills || 0)}</td>
+                            <td>${formatNumber(player.deaths || 0)}</td>
+                            <td>${formatNumber(player.dkpScore || 0)}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                    
+                    // Update summary
+                    const summaryDiv = document.getElementById('playerStatsSummary');
+                    if (summaryDiv) {
+                        const totalPlayers = players.length;
+                        const totalDKP = players.reduce((sum, p) => sum + (p.dkpScore || 0), 0);
+                        const totalT5 = players.reduce((sum, p) => sum + (p.t5Kills || 0), 0);
+                        const totalT4 = players.reduce((sum, p) => sum + (p.t4Kills || 0), 0);
+                        
+                        summaryDiv.innerHTML = `
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <span class="stat-label">Total Players</span>
+                                    <span class="stat-value">${formatNumber(totalPlayers)}</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-label">Total DKP</span>
+                                    <span class="stat-value">${formatNumber(totalDKP)}</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-label">Total T5 Kills</span>
+                                    <span class="stat-value">${formatNumber(totalT5)}</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-label">Total T4 Kills</span>
+                                    <span class="stat-value">${formatNumber(totalT4)}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">No player data available</td></tr>';
+                }
+            }
+        } else {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: red;">Data retriever not available</td></tr>';
+        }
+    } catch (error) {
+        console.error('Error loading player stats:', error);
+        const tbody = document.getElementById('playersTableBody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: red;">Error loading player stats</td></tr>';
+        }
+    }
+}
 
 // Load analytics
 async function loadAnalytics() {

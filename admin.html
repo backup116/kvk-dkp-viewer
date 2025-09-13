@@ -112,6 +112,55 @@
                 </div>
             </div>
 
+            <div id="playersView" class="view-panel">
+                <h2>Player Statistics</h2>
+                <div class="filters">
+                    <select id="playerEventFilter" class="filter-select">
+                        <option value="cumulative">📊 Cumulative (All Events)</option>
+                        <option value="Pass 4*">Pass 4* - Thu, 11.9</option>
+                        <option value="Altar of darkness">Altar of darkness - Tue, 23.9</option>
+                        <option value="Pass 7">Pass 7 - Fri, 3.10</option>
+                        <option value="Pass 8">Pass 8 - Mon, 6.10</option>
+                        <option value="Great ziggurat">Great ziggurat - Sun, 12.10</option>
+                    </select>
+                    <select id="playerKdFilter" class="filter-select">
+                        <option value="all">All Kingdoms</option>
+                    </select>
+                    <select id="playerCampFilter" class="filter-select">
+                        <option value="all">All Camps</option>
+                        <option value="Fire">🔥 Fire Camp</option>
+                        <option value="Earth">🌍 Earth Camp</option>
+                        <option value="Water">💧 Water Camp</option>
+                        <option value="Wind">💨 Wind Camp</option>
+                    </select>
+                    <button id="refreshPlayerStats" class="btn-secondary">Refresh</button>
+                </div>
+                
+                <div class="stats-summary" id="playerStatsSummary">
+                    <!-- Summary stats will be loaded here -->
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="playersTable">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Player Name</th>
+                                <th>Kingdom</th>
+                                <th>Power</th>
+                                <th>Total Kill Points</th>
+                                <th>T5 Kills</th>
+                                <th>T4 Kills</th>
+                                <th>Deaths</th>
+                                <th>DKP Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="playersTableBody">
+                            <!-- Player data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
             <div id="analyticsView" class="view-panel">
                 <h2>Analytics Dashboard</h2>
