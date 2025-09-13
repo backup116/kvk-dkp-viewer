@@ -1,6 +1,10 @@
 // Authentication module for admin access
 const AUTH_KEY = 'rok_admin_session';
-const ADMIN_PASSWORD = 'kvk2001';
+// Define passwords with permission levels
+const PASSWORDS = {
+    'kvk2001': { level: 'full', canManage: true },    // Full admin access
+    'kvk2025': { level: 'limited', canManage: false } // Limited admin (no database management)
+};
 const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 class AuthManager {
@@ -30,10 +34,12 @@ class AuthManager {
     }
 
     login(password) {
-        if (password === ADMIN_PASSWORD) {
+        if (PASSWORDS[password]) {
             const sessionData = {
                 authenticated: true,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                canManage: PASSWORDS[password].canManage,
+                adminLevel: PASSWORDS[password].level
             };
             localStorage.setItem(AUTH_KEY, JSON.stringify(sessionData));
             return true;
@@ -141,6 +147,26 @@ class AuthManager {
             return false;
         }
         return true;
+    }
+
+    // Check if user has data management permissions
+    canManageData() {
+        const session = localStorage.getItem(AUTH_KEY);
+        if (session) {
+            const sessionData = JSON.parse(session);
+            return sessionData.canManage || false;
+        }
+        return false;
+    }
+
+    // Get admin level
+    getAdminLevel() {
+        const session = localStorage.getItem(AUTH_KEY);
+        if (session) {
+            const sessionData = JSON.parse(session);
+            return sessionData.adminLevel || 'limited';
+        }
+        return null;
     }
 }
 

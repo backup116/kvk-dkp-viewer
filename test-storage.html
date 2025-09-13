@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Firebase Storage Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #2196F3;
+            background: #f0f8ff;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        #fileInput {
+            margin: 10px 0;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Firebase Storage Upload Test</h1>
+        
+        <div class="test-section">
+            <h2>Test 1: Create and Upload Text File</h2>
+            <button onclick="testTextUpload()">Run Text File Test</button>
+            <div id="textStatus"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test 2: Upload Custom File</h2>
+            <input type="file" id="fileInput" accept=".xlsx,.xls,.csv,.txt">
+            <br>
+            <button onclick="testFileUpload()">Upload Selected File</button>
+            <div id="fileStatus"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test 3: Create and Upload Sample Excel Data</h2>
+            <button onclick="testExcelUpload()">Generate & Upload Excel</button>
+            <div id="excelStatus"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Results</h2>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- SheetJS for Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC27aBZWEc8XvA3Td-4JMBuf9oQQoudFew",
+            authDomain: "kvk-stats-tracker-d6c29.firebaseapp.com",
+            projectId: "kvk-stats-tracker-d6c29",
+            storageBucket: "kvk-stats-tracker-d6c29.firebasestorage.app",
+            messagingSenderId: "1005757468612",
+            appId: "1:1005757468612:web:5e987f434f559d15e8de91",
+            measurementId: "G-KZXLLXZFE0"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
+        const db = firebase.firestore();
+        
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.className = 'status ' + type;
+            element.innerHTML = message;
+        }
+        
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            results.innerHTML += `<div class="status ${type}">[${timestamp}] ${message}</div>`;
+        }
+        
+        // Test 1: Text file upload
+        async function testTextUpload() {
+            showStatus('textStatus', 'Creating test file...', 'info');
+            
+            try {
+                // Create a blob from text
+                const content = `Test upload at ${new Date().toISOString()}\n`;
+                content += 'This is a test file to verify Firebase Storage upload functionality.\n';
+                content += `Random ID: ${Math.random().toString(36).substring(7)}`;
+                
+                const blob = new Blob([content], { type: 'text/plain' });
+                const timestamp = Date.now();
+                const fileName = `uploads/test/test_${timestamp}.txt`;
+                
+                // Upload to Firebase Storage
+                showStatus('textStatus', 'Uploading to Firebase Storage...', 'info');
+                const storageRef = storage.ref(fileName);
+                const uploadTask = await storageRef.put(blob);
+                
+                // Get download URL
+                const downloadURL = await uploadTask.ref.getDownloadURL();
+                
+                showStatus('textStatus', 
+                    `✅ Success! File uploaded<br>
+                    Path: ${fileName}<br>
+                    <a href="${downloadURL}" target="_blank">Download File</a>`, 
+                    'success'
+                );
+                
+                addResult(`Text file uploaded successfully: ${fileName}`, 'success');
+                
+                // Save metadata to Firestore
+                await db.collection('test_uploads').add({
+                    fileName: fileName,
+                    downloadURL: downloadURL,
+                    type: 'text/plain',
+                    size: blob.size,
+                    uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                addResult('Metadata saved to Firestore', 'success');
+                
+            } catch (error) {
+                showStatus('textStatus', `❌ Error: ${error.message}`, 'error');
+                addResult(`Text upload failed: ${error.message}`, 'error');
+                console.error('Upload error:', error);
+            }
+        }
+        
+        // Test 2: Custom file upload
+        async function testFileUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showStatus('fileStatus', '⚠️ Please select a file first', 'warning');
+                return;
+            }
+            
+            showStatus('fileStatus', `Uploading ${file.name}...`, 'info');
+            
+            try {
+                const timestamp = Date.now();
+                const fileExt = file.name.split('.').pop();
+                const fileName = `uploads/test/custom_${timestamp}.${fileExt}`;
+                
+                // Upload to Firebase Storage
+                const storageRef = storage.ref(fileName);
+                const uploadTask = await storageRef.put(file);
+                
+                // Get download URL
+                const downloadURL = await uploadTask.ref.getDownloadURL();
+                
+                showStatus('fileStatus', 
+                    `✅ Success! File uploaded<br>
+                    Original: ${file.name}<br>
+                    Size: ${(file.size / 1024).toFixed(2)} KB<br>
+                    Path: ${fileName}<br>
+                    <a href="${downloadURL}" target="_blank">Download File</a>`, 
+                    'success'
+                );
+                
+                addResult(`Custom file uploaded: ${file.name}`, 'success');
+                
+            } catch (error) {
+                showStatus('fileStatus', `❌ Error: ${error.message}`, 'error');
+                addResult(`Custom file upload failed: ${error.message}`, 'error');
+                console.error('Upload error:', error);
+            }
+        }
+        
+        // Test 3: Excel file upload
+        async function testExcelUpload() {
+            showStatus('excelStatus', 'Generating Excel file...', 'info');
+            
+            try {
+                // Create sample data
+                const headers = ['Character ID', 'Username', 'Current Power', 'Deaths', 'T5', 'T4'];
+                const data = [
+                    ['12345', 'TestPlayer1', 1000000, 100, 50, 200],
+                    ['67890', 'TestPlayer2', 2000000, 150, 75, 300],
+                    ['11111', 'TestPlayer3', 1500000, 120, 60, 250]
+                ];
+                
+                // Create worksheet
+                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+                
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Test Data');
+                
+                // Convert to blob
+                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                
+                // Upload to Firebase
+                showStatus('excelStatus', 'Uploading Excel to Firebase Storage...', 'info');
+                const timestamp = Date.now();
+                const fileName = `uploads/test/test_data_${timestamp}.xlsx`;
+                
+                const storageRef = storage.ref(fileName);
+                const uploadTask = await storageRef.put(blob);
+                
+                // Get download URL
+                const downloadURL = await uploadTask.ref.getDownloadURL();
+                
+                showStatus('excelStatus', 
+                    `✅ Success! Excel file created and uploaded<br>
+                    Path: ${fileName}<br>
+                    Size: ${(blob.size / 1024).toFixed(2)} KB<br>
+                    <a href="${downloadURL}" target="_blank">Download Excel</a>`, 
+                    'success'
+                );
+                
+                addResult(`Excel file uploaded successfully: ${fileName}`, 'success');
+                
+            } catch (error) {
+                showStatus('excelStatus', `❌ Error: ${error.message}`, 'error');
+                addResult(`Excel upload failed: ${error.message}`, 'error');
+                console.error('Upload error:', error);
+            }
+        }
+        
+        // Run automatic test on page load
+        window.addEventListener('load', () => {
+            addResult('Test page loaded. Firebase initialized.', 'info');
+            addResult(`Storage bucket: ${storage.ref().bucket}`, 'info');
+        });
+    </script>
+</body>
+</html>

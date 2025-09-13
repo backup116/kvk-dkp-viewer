@@ -5,6 +5,20 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     
+    // Hide Manage tab for limited users
+    if (!authManager.canManageData()) {
+        const manageTab = document.querySelector('[data-view="manage"]');
+        if (manageTab) {
+            manageTab.style.display = 'none';
+        }
+        
+        // Also update admin status display to show permission level
+        const adminStatus = document.querySelector('.admin-status');
+        if (adminStatus) {
+            adminStatus.textContent = 'Admin: Limited Access';
+        }
+    }
+    
     initializeAdminDashboard();
 });
 
@@ -16,7 +30,11 @@ function initializeAdminDashboard() {
     setupMapInteractions();
     setupUploadModal();
     loadUploadStatus();
-    setupManageActions();
+    
+    // Only setup manage actions for users with full permissions
+    if (authManager.canManageData()) {
+        setupManageActions();
+    }
 }
 
 // Admin navigation
@@ -185,6 +203,9 @@ async function handleFileUpload(file) {
         const data = await fileParser.parseFile(file);
         fileParser.setEventData(data);
         
+        // Store the original file for backup
+        window.currentUploadFile = file;
+        
         statusDiv.innerHTML = `✅ Event data uploaded (${fileType})`;
         statusDiv.className = 'upload-status success';
         
@@ -269,6 +290,47 @@ async function handleCalculateAndSave() {
         // Calculate DKP with new metrics
         const calculation = fileParser.calculateDKP(fileParser.eventData);
         
+        // Save file backup to Firebase Storage if file exists
+        let fileBackupUrl = null;
+        let fileMetadata = null;
+        
+        if (window.currentUploadFile) {
+            try {
+                const timestamp = Date.now();
+                const fileExt = window.currentUploadFile.name.split('.').pop();
+                // Sanitize event name for filename (remove special characters)
+                const sanitizedEvent = selectedEvent.replace(/[^a-zA-Z0-9]/g, '_');
+                const fileName = `uploads/${currentUploadKD}/${sanitizedEvent}_${timestamp}.${fileExt}`;
+                const storageRef = firebase.storage().ref(fileName);
+                
+                // Upload file to Firebase Storage
+                const uploadTask = await storageRef.put(window.currentUploadFile);
+                fileBackupUrl = await uploadTask.ref.getDownloadURL();
+                
+                // Prepare file metadata
+                fileMetadata = {
+                    originalName: window.currentUploadFile.name,
+                    size: window.currentUploadFile.size,
+                    type: window.currentUploadFile.type,
+                    uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    downloadUrl: fileBackupUrl,
+                    storagePath: fileName,
+                    kdNumber: currentUploadKD,
+                    event: selectedEvent,
+                    fileExtension: fileExt,
+                    timestamp: timestamp
+                };
+                
+                // Save file metadata to Firestore
+                await db.collection('file_uploads').add(fileMetadata);
+                
+                console.log('File backup saved:', fileName);
+            } catch (backupError) {
+                console.error('Error saving file backup:', backupError);
+                // Continue with data processing even if backup fails
+            }
+        }
+        
         // Initialize data processor
         const processor = new DataProcessor();
         
@@ -276,7 +338,8 @@ async function handleCalculateAndSave() {
         console.log('Processing upload with:', {
             kdNumber: currentUploadKD,
             event: selectedEvent,
-            hasData: !!fileParser.eventData
+            hasData: !!fileParser.eventData,
+            hasBackup: !!fileBackupUrl
         });
         
         const result = await processor.processEventUpload(
@@ -294,7 +357,11 @@ async function handleCalculateAndSave() {
             alert(`Data saved successfully!\n` +
                   `Total DKP: ${formatNumber(calculation.totalDKP)}\n` +
                   `Total KP: ${formatNumber(calculation.totalKP)}\n` +
-                  `Players: ${calculation.playerCount}`);
+                  `Players: ${calculation.playerCount}\n` +
+                  `File backup: ${fileBackupUrl ? 'Saved' : 'Not saved'}`);
+            
+            // Clear the stored file reference
+            window.currentUploadFile = null;
             
             closeUploadModal();
             loadUploadStatus(); // Refresh map status
@@ -333,6 +400,7 @@ function closeUploadModal() {
     uploadModal.style.display = 'none';
     currentUploadKD = null;
     fileParser.reset();
+    window.currentUploadFile = null; // Clear file reference
 }
 
 // Store chart instances
